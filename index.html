@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- БЕЗ REFERER (метод RCG): Яндекс.Диск отдаёт файлы только запросам без чужого
+     Referer — с Referer github.io загрузка падает (HTTP 403 Invalid Referer). -->
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#070912">
+<title>S-FILES — отдел необъяснимых явлений</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23070912'/%3E%3Ctext x='16' y='23' font-size='17' font-family='monospace' fill='%23ffcf3f' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Russo+One&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/menu.css">
+</head>
+<body>
+<noscript><p style="color:#ffcf3f;font-family:monospace;padding:20px">S-FILES требует JavaScript — включите его в браузере.</p></noscript>
+
+<div id="room" aria-hidden="true">
+  <div class="wall"></div>
+  <div class="window"><div class="moon"></div><div class="blinds"></div></div>
+  <div class="shelf"></div>
+  <div class="door"></div>
+  <div class="cabinet c1"></div>
+  <div class="cabinet c2"></div>
+  <div class="lamp"></div>
+</div>
+
+<div id="police" aria-hidden="true">
+  <div class="beacon red"></div>
+  <div class="beacon blue"></div>
+  <div class="sweep"></div>
+</div>
+
+<div id="vignette" aria-hidden="true"></div>
+<div id="grain" aria-hidden="true"></div>
+
+<header id="topbar">
+  <div class="brand"><span class="logo">S-FILES</span><span class="sub">ОТДЕЛ НЕОБЪЯСНИМЫХ ЯВЛЕНИЙ</span></div>
+  <a class="rcg" href="https://energomuzik.github.io/retro-challenge-generator/" target="_blank" rel="noopener">RETRO CHALLENGE GENERATOR ↗</a>
+</header>
+
+<main id="stage">
+  <div id="board">
+    <div class="cork">
+      <div class="plate">ДОСКА РАССЛЕДОВАНИЙ · СЕКРЕТНЫЕ МАТЕРИАЛЫ</div>
+      <div class="board-stamp">СОВЕРШЕННО<br>СЕКРЕТНО</div>
+      <svg id="threads" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <div id="notes"></div>
+      <div class="coffee" aria-hidden="true"></div>
+      <div class="clipping" aria-hidden="true"><b>ГРИН-БЭНК ВЕСТНИК</b><i>Свет в небе снова видели над озером. Шериф молчит…</i></div>
+    </div>
+  </div>
+</main>
+
+<footer id="hud">
+  <div class="agents">
+    <span class="badge s">С</span><span class="aname">САЛЛИ</span>
+    <span class="badge m">М</span><span class="aname">МОЛДЕР</span>
+    <span id="ver"></span>
+  </div>
+  <div class="ctrl">
+    <button id="btnMusic" type="button">♪ МУЗЫКА: ВЫКЛ</button>
+    <input id="vol" type="range" min="0" max="1" step="0.05" value="0.6" aria-label="Громкость музыки">
+    <button id="btnLights" type="button">МИГАЛКА: ВКЛ</button>
+    <span id="padStatus">🎮 нет</span>
+  </div>
+</footer>
+
+<div id="caseModal" hidden>
+  <div class="folder" role="dialog" aria-modal="true" aria-labelledby="caseTitle">
+    <div class="tab">ДЕЛО</div>
+    <div class="fhead">
+      <div>
+        <div id="caseNum" class="cnum"></div>
+        <h2 id="caseTitle"></h2>
+        <div id="caseMeta" class="cmeta"></div>
+      </div>
+      <div id="caseStamp" class="stamp"></div>
+    </div>
+    <div class="fbody">
+      <img id="caseThumb" alt="Фото из дела" hidden>
+      <p id="caseBody"></p>
+    </div>
+    <div id="caseHint" class="chint"></div>
+    <div class="fbtns">
+      <button id="btnAccept" type="button" class="gold">ПРИНЯТЬ МИССИЮ</button>
+      <button id="btnClose" type="button">ЗАКРЫТЬ · ESC</button>
+    </div>
+  </div>
+</div>
+
+<div id="gate">
+  <div class="gate-card">
+    <div class="shield">S</div>
+    <h1>S-FILES</h1>
+    <p>ОТДЕЛ НЕОБЪЯСНИМЫХ ЯВЛЕНИЙ<br>ДОСКА РАССЛЕДОВАНИЙ · ДОСТУП АГЕНТАМ</p>
+    <button id="gateBtn" type="button">ВОЙТИ В ОТДЕЛ</button>
+    <span class="gate-hint">клик · Enter · 🎮 A</span>
+  </div>
+</div>
+
+<div id="toast" role="status"></div>
+
+<script src="js/cases.js" defer></script>
+<script src="js/ydisk.js" defer></script>
+<script src="js/net.js" defer></script>
+<script src="js/pad.js" defer></script>
+<script src="js/menu.js" defer></script>
+</body>
+</html>
