@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- БЕЗ REFERER (метод RCG): Яндекс.Диск отдаёт файлы только запросам без чужого
-     Referer — с Referer github.io загрузка падает (HTTP 403 Invalid Referer). -->
+<!-- БЕЗ REFERER: Яндекс.Диск отдаёт файлы только запросам без чужого Referer -->
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#070912">
 <title>S-FILES — отдел необъяснимых явлений</title>
@@ -13,18 +12,77 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Russo+One&family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/menu.css">
+<link rel="stylesheet" href="css/game.css">
 </head>
 <body>
 <noscript><p style="color:#ffcf3f;font-family:monospace;padding:20px">S-FILES требует JavaScript — включите его в браузере.</p></noscript>
 
-<div id="room" aria-hidden="true">
+<!-- ================= ГЕЙТ: вход + выбор роли ================= -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="shield">S</div>
+    <h1>S-FILES</h1>
+    <p>ОТДЕЛ НЕОБЪЯСНИМЫХ ЯВЛЕНИЙ<br>ДОСТУП АГЕНТОВ · ПАТРУЛЬ НА ДВОИХ</p>
+    <div class="gate-roles" id="gateRoles">
+      <button id="roleSally" type="button" class="role role-sally">
+        <span class="role-badge s">С</span>
+        <span class="role-name">САЛЛИ</span>
+        <span class="role-sub">создать пару · быть хостом</span>
+      </button>
+      <button id="roleMolder" type="button" class="role role-molder">
+        <span class="role-badge m">М</span>
+        <span class="role-name">МОЛДЕР</span>
+        <span class="role-sub">подключиться к паре по коду</span>
+      </button>
+    </div>
+    <button id="roleSolo" type="button" class="solo-link">войти одному (осмотр отделения)</button>
+    <span class="gate-hint">клик · Enter</span>
+  </div>
+</div>
+
+<!-- ================= ПАНЕЛЬ ПАРЫ (код) ================= -->
+<div id="roomPanel" hidden>
+  <div class="room-card">
+    <h3>КОД ПАРЫ АГЕНТОВ</h3>
+    <div class="room-row"><div class="room-code" id="roomHostCode">----</div></div>
+    <div class="room-row"><input id="roomCodeInput" maxlength="4" placeholder="КОД" autocomplete="off"></div>
+    <p class="room-hint">Передайте код партнёру: САЛЛИ создаёт пару, МОЛДЕР вводит код. Соединение — напрямую через браузер (PeerJS), как в RCG.</p>
+    <div class="room-btns">
+      <button id="roomGoHost" class="gold" hidden>ОТКРЫТЬ ОТДЕЛ</button>
+      <button id="roomGoGuest" class="gold" hidden>ПОДКЛЮЧИТЬСЯ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= ШТАБ ФБР (главное меню) ================= -->
+<!-- Общий вид: тёмная комната, мелькают фары полиции, доска по центру-заднику,
+     справа дверь со светом (выход на миссию), слева стол с лампой,
+     по центру-перед ящики инвентаря, слева от двери тумба с ТВ+VHS. -->
+<div id="hqRoom" aria-hidden="true">
   <div class="wall"></div>
   <div class="window"><div class="moon"></div><div class="blinds"></div></div>
-  <div class="shelf"></div>
-  <div class="door"></div>
-  <div class="cabinet c1"></div>
-  <div class="cabinet c2"></div>
-  <div class="lamp"></div>
+  <div class="door-exit" id="hotspotDoor" role="button" tabindex="0" title="Выход на миссию">
+    <span class="door-light"></span><span class="door-label">ВЫХОД<br>НА МИССИЮ</span>
+  </div>
+  <div class="desk" id="hotspotDesk" role="button" tabindex="0" title="Стол агента: лампа, телефон, микроскоп, документы">
+    <span class="desk-lamp" id="deskLamp"></span>
+    <span class="desk-phone"></span>
+    <span class="desk-scope"></span>
+    <span class="desk-docs"></span>
+    <span class="desk-label">СТОЛ АГЕНТА</span>
+  </div>
+  <div class="cabinets" id="hotspotCabinets" role="button" tabindex="0" title="Ящики: весь инвентарь">
+    <span class="cab c1"></span><span class="cab c2"></span><span class="cab c3"></span>
+    <span class="cab-label">ЯЩИКИ · ИНВЕНТАРЬ</span>
+  </div>
+  <div class="tv-stand" id="hotspotVhs" role="button" tabindex="0" title="Видеомагнитофон ФБР">
+    <span class="tv"></span>
+    <span class="tv-label">VHS-АРХИВ</span>
+  </div>
+  <div class="board-mini" id="hotspotBoard" role="button" tabindex="0" title="Доска расследований">
+    <span class="bm-notes"></span>
+    <span class="board-label">ДОСКА ДЕЛ</span>
+  </div>
 </div>
 
 <div id="police" aria-hidden="true">
@@ -38,19 +96,73 @@
 
 <header id="topbar">
   <div class="brand"><span class="logo">S-FILES</span><span class="sub">ОТДЕЛ НЕОБЪЯСНИМЫХ ЯВЛЕНИЙ</span></div>
-  <a class="rcg" href="https://energomuzik.github.io/retro-challenge-generator/" target="_blank" rel="noopener">RETRO CHALLENGE GENERATOR ↗</a>
+  <div class="top-right">
+    <span id="pairStatus"></span>
+    <span id="netStatus" class="netstat"></span>
+    <button id="btnEditor" type="button" title="Создание миссий (потом уберём)">🛠 СОЗДАНИЕ КАРТ</button>
+    <a class="rcg" href="https://energomuzik.github.io/retro-challenge-generator/" target="_blank" rel="noopener">RETRO CHALLENGE GENERATOR ↗</a>
+  </div>
 </header>
 
+<!-- ================= СЦЕНЫ ШТАБА ================= -->
 <main id="stage">
-  <div id="board">
-    <div class="cork">
-      <div class="plate">ДОСКА РАССЛЕДОВАНИЙ · СЕКРЕТНЫЕ МАТЕРИАЛЫ</div>
-      <div class="board-stamp">СОВЕРШЕННО<br>СЕКРЕТНО</div>
-      <svg id="threads" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true"></svg>
-      <div id="notes"></div>
-      <div class="coffee" aria-hidden="true"></div>
-      <div class="clipping" aria-hidden="true"><b>ГРИН-БЭНК ВЕСТНИК</b><i>Свет в небе снова видели над озером. Шериф молчит…</i></div>
+  <!-- ДОСКА РАССЛЕДОВАНИЙ (S-номера) -->
+  <div class="sf-scene" data-scene="board" id="sceneBoard">
+    <div id="board">
+      <div class="cork">
+        <div class="plate">ДОСКА РАССЛЕДОВАНИЙ · СЕКРЕТНЫЕ МАТЕРИАЛЫ</div>
+        <div class="board-stamp">СОВЕРШЕННО<br>СЕКРЕТНО</div>
+        <svg id="threads" viewBox="0 0 1000 620" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div id="sfNotes"></div>
+        <div class="coffee" aria-hidden="true"></div>
+      </div>
     </div>
+    <button class="zoom-out" data-zoom="hq">⤺ ОТДАЛИТЬСЯ</button>
+  </div>
+
+  <!-- СТОЛ АГЕНТА -->
+  <div class="sf-scene" data-scene="table" id="sceneTable">
+    <div class="table-scene">
+      <div class="tbl-lamp-zone">
+        <div class="tbl-lamp" id="tblLamp"><i></i></div>
+        <p class="tbl-hint">Наведите на лампу — включится</p>
+      </div>
+      <div class="tbl-items">
+        <button class="tbl-item" id="tblPhone"><span class="ti-ico">☎</span><span>ТЕЛЕФОН</span><small>пробить номера</small></button>
+        <button class="tbl-item" id="tblScope"><span class="ti-ico">🔬</span><span>МИКРОСКОП</span><small>осмотр улик</small></button>
+        <button class="tbl-item" id="tblDocs"><span class="ti-ico">📊</span><span>ДОКУМЕНТЫ</span><small>расходы агентов</small></button>
+      </div>
+    </div>
+    <button class="zoom-out" data-zoom="hq">⤺ ОТДАЛИТЬСЯ</button>
+  </div>
+
+  <!-- ЯЩИКИ / ИНВЕНТАРЬ -->
+  <div class="sf-scene" data-scene="cabinets" id="sceneCabinets">
+    <div class="cabinets-scene">
+      <div class="cab-open-doors"></div>
+      <div id="sfCabinetsBody"></div>
+    </div>
+    <button class="zoom-out" data-zoom="hq">⤺ ОТДАЛИТЬСЯ</button>
+  </div>
+
+  <!-- VHS-ПЛЕЕР -->
+  <div class="sf-scene" data-scene="vhs" id="sceneVhs">
+    <div class="vhs-scene">
+      <div id="sfVhsRoot"></div>
+    </div>
+    <button class="zoom-out" data-zoom="hq">⤺ ОТДАЛИТЬСЯ</button>
+  </div>
+
+  <!-- ДВЕРЬ: ВЫБОР МИССИИ -->
+  <div class="sf-scene" data-scene="door" id="sceneDoor">
+    <div class="door-scene">
+      <div class="doorway-light"></div>
+      <h2 class="door-title">ВЫХОД НА МЕСТО ПРОИСШЕСТВИЯ</h2>
+      <p class="door-sub" id="doorCase">Активное дело: S-02 · МАЯМИ МОЛЛ ИНЦИДЕНТ</p>
+      <button id="doorGo" class="gold big">ВЫЙТИ НА МИССИЮ</button>
+      <p class="door-note">Дело выбирается на доске расследований (S-номер). Оба агента выходят вместе.</p>
+    </div>
+    <button class="zoom-out" data-zoom="hq">⤺ ОТДАЛИТЬСЯ</button>
   </div>
 </main>
 
@@ -68,6 +180,7 @@
   </div>
 </footer>
 
+<!-- ================= ДЕЛО (модалка) ================= -->
 <div id="caseModal" hidden>
   <div class="folder" role="dialog" aria-modal="true" aria-labelledby="caseTitle">
     <div class="tab">ДЕЛО</div>
@@ -91,22 +204,69 @@
   </div>
 </div>
 
-<div id="gate">
-  <div class="gate-card">
-    <div class="shield">S</div>
-    <h1>S-FILES</h1>
-    <p>ОТДЕЛ НЕОБЪЯСНИМЫХ ЯВЛЕНИЙ<br>ДОСКА РАССЛЕДОВАНИЙ · ДОСТУП АГЕНТАМ</p>
-    <button id="gateBtn" type="button">ВОЙТИ В ОТДЕЛ</button>
-    <span class="gate-hint">клик · Enter · 🎮 A</span>
+<!-- ================= ТЕЛЕФОН / ДОКУМЕНТЫ / МИКРОСКОП (модалки) ================= -->
+<div id="phoneModal" class="mini-modal" hidden>
+  <div class="mini-card">
+    <h3>☎ СТАНЦИОНАРНЫЙ ТЕЛЕФОН · ЛИНИЯ ФБР</h3>
+    <p class="mini-sub">Позвоните агенту (САЛЛИ / МОЛДЕР — как пароль) или пробейте номер машины / кредитной карты.</p>
+    <div class="phone-form">
+      <select id="phoneKind">
+        <option value="agent">Агент (САЛЛИ / МОЛДЕР)</option>
+        <option value="car">Номер машины</option>
+        <option value="card">Карта (4 цифры)</option>
+      </select>
+      <input id="phoneCode" placeholder="SALLY / MIA-0407 / 4407" maxlength="12">
+      <button id="phoneGo" class="gold">ПОЗВОНИТЬ</button>
+    </div>
+    <div id="phoneResult" class="phone-result"></div>
+    <button class="mini-close">ЗАКРЫТЬ · ESC</button>
   </div>
 </div>
 
+<div id="docsModal" class="mini-modal" hidden>
+  <div class="mini-card">
+    <h3>📊 РАСХОДЫ ОТДЕЛА · АГЕНТЫ САЛЛИ И МОЛДЕР</h3>
+    <table class="docs-table">
+      <tr><th>Статья</th><th>САЛЛИ</th><th>МОЛДЕР</th></tr>
+      <tr><td>Бензин (патрулирование)</td><td>$ 412.50</td><td>$ 389.00</td></tr>
+      <tr><td>Свет для доски расследований</td><td>$ 76.20</td><td>$ 76.20</td></tr>
+      <tr><td>Кассеты VHS (архив)</td><td>$ 119.99</td><td>$ 119.99</td></tr>
+      <tr><td>Кофе (ночные дежурства)</td><td>$ 88.40</td><td>$ 142.10</td></tr>
+      <tr><td>Фонарики</td><td>$ 45.00</td><td>$ 12.00</td></tr>
+      <tr class="docs-total"><td>ИТОГО</td><td>$ 742.09</td><td>$ 739.29</td></tr>
+    </table>
+    <button class="mini-close">ЗАКРЫТЬ · ESC</button>
+  </div>
+</div>
+
+<div id="scopeModal" class="mini-modal" hidden>
+  <div class="mini-card">
+    <h3>🔬 МИКРОСКОП · ОСМОТР УЛИК</h3>
+    <p class="mini-sub">Выберите предмет из инвентаря, чтобы рассмотреть его под увеличительным стеклом.</p>
+    <div id="scopeList" class="scope-list"></div>
+    <button class="mini-close">ЗАКРЫТЬ · ESC</button>
+  </div>
+</div>
+
+<!-- ================= МИССИЯ ================= -->
+<div id="missionWrap" hidden>
+  <canvas id="missionCanvas"></canvas>
+</div>
+
+<!-- ================= РЕДАКТОР КАРТ ================= -->
+<div id="mapEditor" hidden></div>
+
 <div id="toast" role="status"></div>
 
-<script src="js/cases.js" defer></script>
-<script src="js/ydisk.js" defer></script>
 <script src="js/net.js" defer></script>
+<script src="js/engine.js" defer></script>
+<script src="js/render.js" defer></script>
+<script src="js/inventory.js" defer></script>
+<script src="js/vhs.js" defer></script>
+<script src="js/hq.js" defer></script>
 <script src="js/pad.js" defer></script>
+<script src="js/editor.js" defer></script>
+<script src="js/app.js" defer></script>
 <script src="js/menu.js" defer></script>
 </body>
 </html>

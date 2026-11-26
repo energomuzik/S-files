@@ -150,3 +150,21 @@ body.entered .note{animation:drop .55s cubic-bezier(.2,.9,.3,1.2) forwards}
   .beacon{opacity:.22}
   body.entered .note,body.entered .thread{animation-duration:.01s}
 }
+
+/* ===== v2: gate hidden + сцены штаба ===== */
+#gate[hidden] { display: none !important; }
+#roomPanel[hidden] { display: none !important; }
+#missionWrap[hidden] { display: none !important; }
+#mapEditor[hidden] { display: none !important; }
+.case-hide { display: none !important; }
+
+/* ===== v2: заметки-фото на доске (класс .note open с полароидом) ===== */
+.note.open { width: 17.5%; display: flex; flex-direction: column; align-items: center; }
+.note.open .polaroid { position: relative; width: 100%; background: #f2efe6; padding: .7em .7em 2.2em; box-shadow: 0 10px 20px rgba(0,0,0,.5); transform: rotate(1.5deg); }
+.note.open .polaroid img { display: block; width: 100%; aspect-ratio: 6/7; object-fit: cover; background: #20242e; filter: saturate(.92) contrast(1.05); }
+.note.open .caption { font-family: 'Caveat', cursive; font-size: 1.15em; color: #2c2416; margin-top: -1.4em; position: relative; }
+.note.open .tag { font-size: .62em; letter-spacing: 1px; color: #6b5518; font-weight: 600; }
+.note.open .pin, .note.open .tape { pointer-events: none; }
+
+/* ===== v2: SVG-нитки не перехватывают клики по заметкам ===== */
+#threads { pointer-events: none; }
